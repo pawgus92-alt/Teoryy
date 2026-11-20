@@ -1,3 +1,5 @@
+import { detectLocale, isLocale } from '../i18n/messages'
+import type { Locale } from '../i18n/messages'
 import type {
   AppState,
   Category,
@@ -118,18 +120,21 @@ function normalizeUser(value: unknown): UserProfile | null {
   return { id: value.id, name: name.slice(0, 40), isModerator: value.isModerator === true }
 }
 
-export function createUser(): UserProfile {
+export function createUser(locale: Locale): UserProfile {
   const suffix = Math.floor(1000 + Math.random() * 9000)
-  return { id: `user-${crypto.randomUUID()}`, name: `Исследователь ${suffix}`, isModerator: false }
+  const name = locale === 'en' ? `Researcher ${suffix}` : `Исследователь ${suffix}`
+  return { id: `user-${crypto.randomUUID()}`, name, isModerator: false }
 }
 
 export function createInitialState(): AppState {
+  const locale = detectLocale()
   return {
     theories: seedTheories(),
-    user: createUser(),
+    user: createUser(locale),
     votes: {},
     confirmations: {},
     theme: 'dark',
+    locale,
   }
 }
 
@@ -146,6 +151,7 @@ function normalizeState(value: unknown): AppState | null {
     votes: normalizeVotes(value.votes),
     confirmations: normalizeConfirmations(value.confirmations),
     theme: value.theme === 'light' ? 'light' : 'dark',
+    locale: isLocale(value.locale) ? value.locale : 'ru',
   }
 }
 
@@ -172,17 +178,20 @@ export function loadState(): AppState {
   const stored = repository.load()
   if (stored) {
     applyTheme(stored.theme)
+    applyLocale(stored.locale)
     return stored
   }
   const fresh = createInitialState()
   repository.save(fresh)
   applyTheme(fresh.theme)
+  applyLocale(fresh.locale)
   return fresh
 }
 
 export function saveState(state: AppState): void {
   repository.save(state)
   applyTheme(state.theme)
+  applyLocale(state.locale)
 }
 
 export function applyTheme(theme: AppState['theme']): void {
@@ -190,4 +199,9 @@ export function applyTheme(theme: AppState['theme']): void {
   document.documentElement.classList.toggle('dark', theme !== 'light')
   const meta = document.querySelector('meta[name="theme-color"]')
   meta?.setAttribute('content', theme === 'light' ? '#f6f3ec' : '#0c0e14')
+}
+
+export function applyLocale(locale: Locale): void {
+  if (typeof document === 'undefined') return
+  document.documentElement.lang = locale
 }

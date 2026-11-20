@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react'
-import { CATEGORIES, categoryLabel } from '../types/theory'
+import { categoryMessage } from '../i18n/messages'
+import { useI18n } from '../i18n/useI18n'
+import { CATEGORIES } from '../types/theory'
 import type { TheoryDraft } from '../types/theory'
 import { useTheoryStore } from '../store/useTheoryStore'
 import { formatDate } from '../utils/format'
@@ -17,6 +19,7 @@ export function TheoryForm({
   onSubmit: (draft: TheoryDraft) => void
 }) {
   const user = useTheoryStore((state) => state.user)
+  const { locale, t } = useI18n()
   const [draft, setDraft] = useState<DraftInput>(initial ?? emptyDraft())
   const [errors, setErrors] = useState<FieldErrors>({})
   const [preview, setPreview] = useState(false)
@@ -47,11 +50,11 @@ export function TheoryForm({
     <div>
       {preview && checked.value ? (
         <div className="rounded-2xl border border-line bg-bg p-4">
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-mute">Предпросмотр</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-mute">{t('preview')}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <StatusBadge status="pending" />
             <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-mute">
-              {categoryLabel(checked.value.category)}
+              {t(categoryMessage(checked.value.category))}
             </span>
           </div>
           <h3 className="mt-3 font-serif text-3xl leading-tight">{checked.value.title}</h3>
@@ -66,8 +69,8 @@ export function TheoryForm({
             </div>
           )}
           <p className="mt-4 text-xs text-mute">
-            {checked.value.anonymous ? 'Аноним' : user.name}
-            {checked.value.predictedDate && ` · ожидается к ${formatDate(checked.value.predictedDate)}`}
+            {checked.value.anonymous ? t('anonymous') : user.name}
+            {checked.value.predictedDate && ` · ${t('expectedBy', { date: formatDate(checked.value.predictedDate, locale) })}`}
           </p>
           {checked.value.tags.length > 0 && (
             <p className="mt-2 text-xs text-mute">{checked.value.tags.map((tag) => `#${tag}`).join('  ')}</p>
@@ -75,37 +78,37 @@ export function TheoryForm({
         </div>
       ) : (
         <div className="space-y-4">
-          <Field label="Заголовок" hint={`${draft.title.trim().length}/120`} error={errors.title}>
+          <Field label={t('fieldTitle')} hint={`${draft.title.trim().length}/120`} error={errors.title && t(errors.title)}>
             <input
               value={draft.title}
               onChange={(event) => patch({ title: event.target.value })}
               maxLength={140}
               required
               className={inputClass}
-              placeholder="Коротко и проверяемо, от 10 до 120 символов"
+              placeholder={t('titlePlaceholder')}
             />
           </Field>
-          <Field label="Краткое описание" hint={`${draft.summary.trim().length}/400`} error={errors.summary}>
+          <Field label={t('fieldSummary')} hint={`${draft.summary.trim().length}/400`} error={errors.summary && t(errors.summary)}>
             <textarea
               value={draft.summary}
               onChange={(event) => patch({ summary: event.target.value })}
               rows={3}
               required
               className={inputClass}
-              placeholder="Две-три фразы: что утверждается и как это узнать"
+              placeholder={t('summaryPlaceholder')}
             />
           </Field>
-          <Field label="Полный текст" hint="необязательно" error={errors.body}>
+          <Field label={t('fieldBody')} hint={t('optional')} error={errors.body && t(errors.body)}>
             <textarea
               value={draft.body}
               onChange={(event) => patch({ body: event.target.value })}
               rows={8}
               className={inputClass}
-              placeholder="Аргументы, критерий сбытия, что не будет считаться подтверждением"
+              placeholder={t('bodyPlaceholder')}
             />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Категория" error={errors.category}>
+            <Field label={t('category')} error={errors.category && t(errors.category)}>
               <select
                 value={draft.category}
                 onChange={(event) => patch({ category: event.target.value })}
@@ -113,12 +116,12 @@ export function TheoryForm({
               >
                 {CATEGORIES.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.label}
+                    {t(categoryMessage(category.id))}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Дата предполагаемого сбытия" hint="необязательно" error={errors.predictedDate}>
+            <Field label={t('fieldDate')} hint={t('optional')} error={errors.predictedDate && t(errors.predictedDate)}>
               <input
                 type="date"
                 value={draft.predictedDate}
@@ -127,12 +130,12 @@ export function TheoryForm({
               />
             </Field>
           </div>
-          <Field label="Теги" hint="через запятую, необязательно" error={errors.tags}>
+          <Field label={t('fieldTags')} hint={t('tagsHint')} error={errors.tags && t(errors.tags)}>
             <input
               value={draft.tags}
               onChange={(event) => patch({ tags: event.target.value })}
               className={inputClass}
-              placeholder="кванты, связь, эксперимент"
+              placeholder={t('tagsPlaceholder')}
             />
           </Field>
           <label className="flex items-start gap-3 rounded-2xl border border-line bg-bg px-3 py-3 text-sm">
@@ -143,10 +146,8 @@ export function TheoryForm({
               className="mt-1"
             />
             <span>
-              <span className="font-medium">Опубликовать анонимно</span>
-              <span className="mt-1 block text-mute">
-                В ленте будет «Аноним». Редактировать запись сможете вы и модератор этого браузера.
-              </span>
+              <span className="font-medium">{t('anonymousPost')}</span>
+              <span className="mt-1 block text-mute">{t('anonymousHint')}</span>
             </span>
           </label>
         </div>
@@ -154,11 +155,11 @@ export function TheoryForm({
       <div className="mt-5 flex flex-wrap justify-end gap-2">
         {preview ? (
           <button type="button" onClick={() => setPreview(false)} className="rounded-full border border-line px-4 py-2 text-sm font-semibold">
-            Вернуться к правкам
+            {t('backToEdit')}
           </button>
         ) : (
           <button type="button" onClick={openPreview} className="rounded-full border border-line px-4 py-2 text-sm font-semibold">
-            Предпросмотр
+            {t('preview')}
           </button>
         )}
         <button type="button" onClick={publish} className="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">

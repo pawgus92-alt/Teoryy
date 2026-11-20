@@ -1,18 +1,21 @@
 import { useState } from 'react'
 import { Send } from 'lucide-react'
+import { displayAuthor } from '../i18n/present'
+import { useI18n } from '../i18n/useI18n'
 import type { Comment } from '../types/theory'
 import { useTheoryStore } from '../store/useTheoryStore'
 import { formatDate, plural } from '../utils/format'
 
 export function CommentTree({ theoryId, comments }: { theoryId: string; comments: Comment[] }) {
   const addComment = useTheoryStore((state) => state.addComment)
+  const { locale, t } = useI18n()
   const [text, setText] = useState('')
   const [error, setError] = useState('')
 
   const submit = () => {
     const ok = addComment(theoryId, text)
     if (!ok) {
-      setError('Комментарий должен быть от 1 до 2000 символов')
+      setError(t('errComment'))
       return
     }
     setText('')
@@ -21,22 +24,22 @@ export function CommentTree({ theoryId, comments }: { theoryId: string; comments
 
   return (
     <section className="mt-10">
-      <h2 className="font-serif text-3xl">Обсуждение</h2>
+      <h2 className="font-serif text-3xl">{t('discussion')}</h2>
       <p className="mt-1 text-sm text-mute">
         {comments.length === 0
-          ? 'Пока никто не спорит. Аргумент важнее громкости.'
-          : `${countAll(comments)} ${plural(countAll(comments), 'реплика', 'реплики', 'реплик')}`}
+          ? t('discussionEmptyLead')
+          : `${countAll(comments)} ${plural(countAll(comments), locale, t('replyOne'), t('replyFew'), t('replyMany'))}`}
       </p>
       <div className="mt-4 rounded-2xl border border-line bg-card p-4">
         <label htmlFor="root-comment" className="text-sm font-medium">
-          Комментарий
+          {t('commentLabel')}
         </label>
         <textarea
           id="root-comment"
           value={text}
           onChange={(event) => setText(event.target.value)}
           rows={3}
-          placeholder="Что в формулировке держится, а что нет?"
+          placeholder={t('commentPlaceholder')}
           className="mt-2 w-full resize-y rounded-xl border border-line bg-bg px-3 py-2 text-sm outline-none ring-accent/40 focus:ring-2"
         />
         {error && <p className="mt-2 text-sm text-rose-600 dark:text-rose-300">{error}</p>}
@@ -46,7 +49,7 @@ export function CommentTree({ theoryId, comments }: { theoryId: string; comments
           className="mt-3 inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
         >
           <Send size={15} aria-hidden />
-          Отправить
+          {t('send')}
         </button>
       </div>
       {comments.length === 0 ? (
@@ -54,8 +57,8 @@ export function CommentTree({ theoryId, comments }: { theoryId: string; comments
           <p className="text-4xl" aria-hidden>
             💬
           </p>
-          <p className="mt-3 font-serif text-2xl">Комментариев пока нет</p>
-          <p className="mt-1 text-sm text-mute">Начните обсуждение — дерево ответов появится здесь.</p>
+          <p className="mt-3 font-serif text-2xl">{t('noComments')}</p>
+          <p className="mt-1 text-sm text-mute">{t('noCommentsHint')}</p>
         </div>
       ) : (
         <ol className="mt-6 space-y-4">
@@ -74,6 +77,7 @@ function countAll(comments: Comment[]): number {
 
 function CommentNode({ theoryId, comment, depth }: { theoryId: string; comment: Comment; depth: number }) {
   const addComment = useTheoryStore((state) => state.addComment)
+  const { locale, t } = useI18n()
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [error, setError] = useState('')
@@ -81,7 +85,7 @@ function CommentNode({ theoryId, comment, depth }: { theoryId: string; comment: 
   const submit = () => {
     const ok = addComment(theoryId, text, comment.id)
     if (!ok) {
-      setError('Ответ должен быть от 1 до 2000 символов')
+      setError(t('errReply'))
       return
     }
     setText('')
@@ -93,17 +97,17 @@ function CommentNode({ theoryId, comment, depth }: { theoryId: string; comment: 
     <li className={depth > 0 ? 'ml-3 border-l border-line pl-3 sm:ml-5 sm:pl-4' : ''}>
       <article className="rounded-2xl border border-line bg-card px-4 py-3">
         <header className="flex flex-wrap items-baseline justify-between gap-2 text-xs text-mute">
-          <span className="font-semibold text-ink">{comment.author}</span>
-          <time dateTime={comment.createdAt}>{formatDate(comment.createdAt)}</time>
+          <span className="font-semibold text-ink">{displayAuthor(comment.author, false, t('anonymous'))}</span>
+          <time dateTime={comment.createdAt}>{formatDate(comment.createdAt, locale)}</time>
         </header>
         <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{comment.text}</p>
         <button type="button" onClick={() => setOpen((value) => !value)} className="mt-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-          {open ? 'Скрыть ответ' : 'Ответить'}
+          {open ? t('hideReply') : t('reply')}
         </button>
         {open && (
           <div className="mt-3">
             <label className="sr-only" htmlFor={`reply-${comment.id}`}>
-              Ответ для {comment.author}
+              {t('replyFor', { name: displayAuthor(comment.author, false, t('anonymous')) })}
             </label>
             <textarea
               id={`reply-${comment.id}`}
@@ -118,7 +122,7 @@ function CommentNode({ theoryId, comment, depth }: { theoryId: string; comment: 
               onClick={submit}
               className="mt-2 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500"
             >
-              Ответить
+              {t('reply')}
             </button>
           </div>
         )}

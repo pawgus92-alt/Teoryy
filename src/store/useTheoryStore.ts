@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { translate } from '../i18n/messages'
+import type { Locale } from '../i18n/messages'
 import type { AppState, ConfirmChoice, Theory, TheoryDraft, TheoryStatus, VoteDirection } from '../types/theory'
 import { insertReply, uid } from '../utils/format'
 import { seedTheories } from '../utils/seed'
@@ -8,6 +10,7 @@ interface TheoryStore extends AppState {
   toast: string | null
   showToast: (message: string) => void
   setTheme: (theme: AppState['theme']) => void
+  setLocale: (locale: Locale) => void
   setUserName: (name: string) => boolean
   toggleModerator: () => void
   resetDemo: () => void
@@ -29,6 +32,7 @@ function persist(state: TheoryStore): void {
     votes: state.votes,
     confirmations: state.confirmations,
     theme: state.theme,
+    locale: state.locale,
   })
 }
 
@@ -50,6 +54,10 @@ export const useTheoryStore = create<TheoryStore>((set, get) => ({
     set({ theme })
     persist(get())
   },
+  setLocale: (locale) => {
+    set({ locale })
+    persist(get())
+  },
   setUserName: (name) => {
     const trimmed = name.trim()
     if (trimmed.length < 2 || trimmed.length > 40) return false
@@ -65,7 +73,7 @@ export const useTheoryStore = create<TheoryStore>((set, get) => ({
   resetDemo: () => {
     set({ theories: seedTheories(), votes: {}, confirmations: {} })
     persist(get())
-    get().showToast('Демо-данные восстановлены')
+    get().showToast(translate(get().locale, 'toastDemo'))
   },
   addTheory: (draft) => {
     const user = get().user

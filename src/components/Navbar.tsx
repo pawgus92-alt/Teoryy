@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { BarChart3, Moon, Plus, Sun } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
+import { useI18n } from '../i18n/useI18n'
+import type { Locale } from '../i18n/messages'
 import { useTheoryStore } from '../store/useTheoryStore'
 import { cx } from '../utils/format'
 
@@ -12,6 +14,7 @@ export function Navbar() {
   const toggleModerator = useTheoryStore((state) => state.toggleModerator)
   const resetDemo = useTheoryStore((state) => state.resetDemo)
   const showToast = useTheoryStore((state) => state.showToast)
+  const { locale, setLocale, t } = useI18n()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(user.name)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -29,7 +32,7 @@ export function Navbar() {
 
   const saveName = () => {
     const ok = setUserName(name)
-    showToast(ok ? 'Имя сохранено' : 'Имя: от 2 до 40 символов')
+    showToast(ok ? t('toastNameOk') : t('toastNameBad'))
   }
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -48,19 +51,19 @@ export function Navbar() {
               <circle cx="22" cy="12" r="2.1" fill="#fbbf24" />
             </svg>
           </span>
-          <span className="font-serif text-[1.7rem] leading-none tracking-tight">Теории</span>
+          <span className="font-serif text-[1.7rem] leading-none tracking-tight">{t('brand')}</span>
         </NavLink>
-        <nav className="hidden items-center gap-1 sm:flex" aria-label="Разделы">
+        <nav className="hidden items-center gap-1 sm:flex" aria-label={t('sections')}>
           <NavLink to="/" end className={linkClass}>
-            Лента
+            {t('feed')}
           </NavLink>
           <NavLink to="/stats" className={linkClass}>
-            Статистика
+            {t('stats')}
           </NavLink>
         </nav>
         <NavLink
           to="/stats"
-          aria-label="Статистика"
+          aria-label={t('stats')}
           className="grid h-10 w-10 place-items-center rounded-full border border-line text-mute sm:hidden"
         >
           <BarChart3 size={18} />
@@ -70,12 +73,28 @@ export function Navbar() {
           className="inline-flex items-center gap-1 rounded-full bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
         >
           <Plus size={16} aria-hidden />
-          <span className="hidden sm:inline">Добавить теорию</span>
-          <span className="sm:hidden">Новая</span>
+          <span className="hidden sm:inline">{t('addTheory')}</span>
+          <span className="sm:hidden">{t('addShort')}</span>
         </NavLink>
+        <div className="flex rounded-full border border-line p-0.5" role="group" aria-label={t('language')}>
+          {(['ru', 'en'] as const satisfies readonly Locale[]).map((code) => (
+            <button
+              key={code}
+              type="button"
+              aria-pressed={locale === code}
+              onClick={() => setLocale(code)}
+              className={cx(
+                'rounded-full px-2 py-1 text-xs font-semibold uppercase',
+                locale === code ? 'bg-indigo-600 text-white' : 'text-mute hover:text-ink',
+              )}
+            >
+              {code}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
-          aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
+          aria-label={theme === 'dark' ? t('themeLight') : t('themeDark')}
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="grid h-10 w-10 place-items-center rounded-full border border-line text-mute hover:text-ink"
         >
@@ -93,9 +112,9 @@ export function Navbar() {
           </button>
           {open && (
             <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-line bg-card p-4 shadow-card">
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-mute">Профиль в этом браузере</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-mute">{t('profile')}</p>
               <label className="mt-3 block text-sm">
-                Имя
+                {t('name')}
                 <input
                   value={name}
                   onChange={(event) => setName(event.target.value)}
@@ -103,13 +122,13 @@ export function Navbar() {
                 />
               </label>
               <button type="button" onClick={saveName} className="mt-2 text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-                Сохранить имя
+                {t('saveName')}
               </button>
               <label className="mt-4 flex items-start gap-2 text-sm">
                 <input type="checkbox" checked={user.isModerator} onChange={toggleModerator} className="mt-1" />
                 <span>
-                  Режим модератора
-                  <span className="mt-1 block text-xs text-mute">Локальный переключатель: можно закрывать чужие теории.</span>
+                  {t('moderator')}
+                  <span className="mt-1 block text-xs text-mute">{t('moderatorHint')}</span>
                 </span>
               </label>
               <button
@@ -120,7 +139,7 @@ export function Navbar() {
                 }}
                 className="mt-4 text-sm font-semibold text-mute hover:text-ink"
               >
-                Вернуть демо-данные
+                {t('restoreDemo')}
               </button>
             </div>
           )}

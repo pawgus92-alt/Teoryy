@@ -1,3 +1,5 @@
+import type { MessageKey } from '../i18n/messages'
+import { searchBlob } from '../i18n/present'
 import type { Category, Comment, Theory, TheoryDraft, TheoryStatus } from '../types/theory'
 import { isCategory } from '../types/theory'
 import { countComments } from './format'
@@ -19,10 +21,7 @@ export function filterTheories(theories: Theory[], query: TheoryQuery): Theory[]
     if (query.category !== 'all' && theory.category !== query.category) return false
     if (query.status !== 'all' && theory.status !== query.status) return false
     if (!needle) return true
-    const haystack = [theory.title, theory.summary, theory.body, theory.author, ...theory.tags]
-      .join('\n')
-      .toLowerCase()
-    return haystack.includes(needle)
+    return searchBlob(theory).includes(needle)
   })
 
   const sorted = [...filtered]
@@ -41,12 +40,12 @@ export function filterTheories(theories: Theory[], query: TheoryQuery): Theory[]
 }
 
 export interface FieldErrors {
-  title?: string
-  summary?: string
-  body?: string
-  category?: string
-  tags?: string
-  predictedDate?: string
+  title?: MessageKey
+  summary?: MessageKey
+  body?: MessageKey
+  category?: MessageKey
+  tags?: MessageKey
+  predictedDate?: MessageKey
 }
 
 export interface DraftInput {
@@ -59,7 +58,7 @@ export interface DraftInput {
   anonymous: boolean
 }
 
-export function parseTags(raw: string): { tags: string[]; error?: string } {
+export function parseTags(raw: string): { tags: string[]; error?: MessageKey } {
   const parts = raw
     .split(',')
     .map((tag) => tag.trim())
@@ -72,9 +71,9 @@ export function parseTags(raw: string): { tags: string[]; error?: string } {
     seen.add(key)
     unique.push(tag)
   }
-  if (unique.length > 6) return { tags: unique, error: 'Не больше 6 тегов' }
+  if (unique.length > 6) return { tags: unique, error: 'errTagsMax' }
   const tooLong = unique.find((tag) => tag.length < 2 || tag.length > 24)
-  if (tooLong) return { tags: unique, error: 'Каждый тег — от 2 до 24 символов' }
+  if (tooLong) return { tags: unique, error: 'errTagLength' }
   return { tags: unique }
 }
 
@@ -84,17 +83,17 @@ export function validateDraft(input: DraftInput): { errors: FieldErrors; value: 
   const summary = input.summary.trim()
   const body = input.body.trim()
 
-  if (!title) errors.title = 'Заголовок обязателен'
-  else if (title.length < 10) errors.title = 'Минимум 10 символов'
-  else if (title.length > 120) errors.title = 'Максимум 120 символов'
+  if (!title) errors.title = 'errTitleRequired'
+  else if (title.length < 10) errors.title = 'errTitleMin'
+  else if (title.length > 120) errors.title = 'errTitleMax'
 
-  if (!summary) errors.summary = 'Краткое описание обязательно'
-  else if (summary.length < 20) errors.summary = 'Минимум 20 символов'
-  else if (summary.length > 400) errors.summary = 'Максимум 400 символов'
+  if (!summary) errors.summary = 'errSummaryRequired'
+  else if (summary.length < 20) errors.summary = 'errSummaryMin'
+  else if (summary.length > 400) errors.summary = 'errSummaryMax'
 
-  if (body.length > 8000) errors.body = 'Максимум 8000 символов'
+  if (body.length > 8000) errors.body = 'errBodyMax'
 
-  if (!isCategory(input.category)) errors.category = 'Выберите категорию'
+  if (!isCategory(input.category)) errors.category = 'errCategory'
 
   const parsedTags = parseTags(input.tags)
   if (parsedTags.error) errors.tags = parsedTags.error
@@ -102,7 +101,7 @@ export function validateDraft(input: DraftInput): { errors: FieldErrors; value: 
   let predictedDate: string | undefined
   if (input.predictedDate) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input.predictedDate)) {
-      errors.predictedDate = 'Укажите корректную дату'
+      errors.predictedDate = 'errDate'
     } else {
       predictedDate = input.predictedDate
     }

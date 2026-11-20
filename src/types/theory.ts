@@ -72,6 +72,7 @@ export interface AppState {
   votes: Record<string, VoteDirection>
   confirmations: Record<string, ConfirmChoice>
   theme: 'dark' | 'light'
+  locale: 'ru' | 'en'
 }
 
 export const STATUS_META: Record<

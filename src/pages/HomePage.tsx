@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AddTheoryModal } from '../components/AddTheoryModal'
 import { FilterBar } from '../components/FilterBar'
 import { TheoryCard } from '../components/TheoryCard'
+import { useI18n } from '../i18n/useI18n'
 import { useTheoryStore } from '../store/useTheoryStore'
 import type { Category, TheoryStatus } from '../types/theory'
 import { isCategory } from '../types/theory'
@@ -15,9 +16,14 @@ const statuses = new Set(['pending', 'fulfilled', 'refuted'])
 
 export function HomePage() {
   const theories = useTheoryStore((state) => state.theories)
+  const { locale, t } = useI18n()
   const [params, setParams] = useSearchParams()
   const [open, setOpen] = useState(false)
-  const stats = buildStats(theories)
+  const stats = buildStats(theories, locale, t('anonymous'))
+
+  useEffect(() => {
+    document.title = t('brand')
+  }, [t])
 
   const query: TheoryQuery = {
     q: params.get('q') ?? '',
@@ -42,24 +48,22 @@ export function HomePage() {
     <div>
       <section className="grid items-end gap-6 pb-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">Журнал гипотез</p>
-          <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-[1.05] sm:text-6xl">Теории, которые можно проверить временем</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-mute">
-            Публикуйте формулировку, спорьте в ветке комментариев и отмечайте, что сбылось, а что рассыпалось о факты.
-          </p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">{t('journal')}</p>
+          <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-[1.05] sm:text-6xl">{t('heroTitle')}</h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-mute">{t('heroText')}</p>
           <button
             type="button"
             onClick={() => setOpen(true)}
             className="mt-5 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
           >
-            + Добавить теорию
+            {t('addTheoryPlus')}
           </button>
         </div>
         <div className="rounded-3xl border border-line bg-card p-5 shadow-card">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute">Счётчик сбытия</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-mute">{t('fulfillment')}</p>
           <p className="mt-2 font-serif text-6xl leading-none">{stats.total === 0 ? '—' : `${stats.rate}%`}</p>
           <p className="mt-3 text-sm text-mute">
-            {stats.fulfilled} сбылось · {stats.refuted} опровергнуто · {stats.pending} на рассмотрении
+            {t('homeBreakdown', { fulfilled: stats.fulfilled, refuted: stats.refuted, pending: stats.pending })}
           </p>
         </div>
       </section>
@@ -71,15 +75,13 @@ export function HomePage() {
           <p className="text-5xl" aria-hidden>
             {theories.length === 0 ? '📭' : '🔭'}
           </p>
-          <h2 className="mt-4 font-serif text-3xl">{theories.length === 0 ? 'Журнал пока пуст' : 'Ничего не нашлось'}</h2>
+          <h2 className="mt-4 font-serif text-3xl">{theories.length === 0 ? t('emptyJournal') : t('emptySearch')}</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-mute">
-            {theories.length === 0
-              ? 'Добавьте первую теорию — карточка появится в ленте.'
-              : 'Смените категорию, статус или запрос. Демо-набор можно вернуть в меню профиля.'}
+            {theories.length === 0 ? t('emptyJournalHint') : t('emptySearchHint')}
           </p>
           {theories.length > 0 && (
             <button type="button" onClick={() => setParams({})} className="mt-4 text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-              Сбросить фильтры
+              {t('resetFilters')}
             </button>
           )}
         </div>

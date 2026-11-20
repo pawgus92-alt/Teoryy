@@ -1,3 +1,4 @@
+import type { Locale } from '../i18n/messages'
 import type { Theory } from '../types/theory'
 import { formatMonth } from './format'
 import { ratingOf } from './theory'
@@ -41,7 +42,7 @@ function currentMonth(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 }
 
-export function fulfilledSeries(theories: Theory[]): MonthPoint[] {
+export function fulfilledSeries(theories: Theory[], locale: Locale = 'ru'): MonthPoint[] {
   const fulfilled = theories.filter((theory) => theory.status === 'fulfilled' && theory.fulfilledAt)
   if (fulfilled.length === 0) return []
 
@@ -59,13 +60,13 @@ export function fulfilledSeries(theories: Theory[]): MonthPoint[] {
   while (cursor <= end) {
     const count = counts.get(cursor) ?? 0
     cumulative += count
-    points.push({ key: cursor, label: formatMonth(cursor), count, cumulative })
+    points.push({ key: cursor, label: formatMonth(cursor, locale), count, cumulative })
     cursor = shiftMonth(cursor, 1)
   }
   return points
 }
 
-export function buildStats(theories: Theory[]): DashboardStats {
+export function buildStats(theories: Theory[], locale: Locale = 'ru', anonymousName = 'Аноним'): DashboardStats {
   const fulfilled = theories.filter((theory) => theory.status === 'fulfilled').length
   const refuted = theories.filter((theory) => theory.status === 'refuted').length
   const pending = theories.filter((theory) => theory.status === 'pending').length
@@ -73,7 +74,7 @@ export function buildStats(theories: Theory[]): DashboardStats {
 
   const authors = new Map<string, AuthorStat>()
   for (const theory of theories) {
-    const name = theory.author
+    const name = theory.anonymous ? anonymousName : theory.author
     const current = authors.get(name) ?? { name, theories: 0, rating: 0 }
     current.theories += 1
     current.rating += ratingOf(theory)
@@ -88,8 +89,8 @@ export function buildStats(theories: Theory[]): DashboardStats {
     rate: total === 0 ? 0 : Math.round((fulfilled / total) * 100),
     topTheories: [...theories].sort((a, b) => ratingOf(b) - ratingOf(a)).slice(0, 5),
     authors: [...authors.values()]
-      .sort((a, b) => b.theories - a.theories || b.rating - a.rating || a.name.localeCompare(b.name, 'ru'))
+      .sort((a, b) => b.theories - a.theories || b.rating - a.rating || a.name.localeCompare(b.name, locale))
       .slice(0, 5),
-    series: fulfilledSeries(theories),
+    series: fulfilledSeries(theories, locale),
   }
 }

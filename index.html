@@ -19,7 +19,10 @@
     <script>
       try {
         const raw = localStorage.getItem('teorii.v1')
-        const theme = raw ? JSON.parse(raw).theme : 'dark'
+        const saved = raw ? JSON.parse(raw) : {}
+        const theme = saved.theme || 'dark'
+        const locale = saved.locale === 'en' ? 'en' : 'ru'
+        document.documentElement.lang = locale
         document.documentElement.classList.toggle('dark', theme !== 'light')
         document.querySelector('meta[name="theme-color"]').setAttribute(
           'content',

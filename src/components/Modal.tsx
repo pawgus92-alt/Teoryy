@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { useI18n } from '../i18n/useI18n'
 
 export function Modal({
   open,
@@ -15,6 +16,7 @@ export function Modal({
   children: ReactNode
 }) {
   const reduce = useReducedMotion()
+  const { t } = useI18n()
 
   useEffect(() => {
     if (!open) return
@@ -39,7 +41,7 @@ export function Modal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <button type="button" aria-label="Закрыть" className="absolute inset-0 bg-ink/50" onClick={onClose} />
+          <button type="button" aria-label={t('close')} className="absolute inset-0 bg-ink/50" onClick={onClose} />
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -57,7 +59,7 @@ export function Modal({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Закрыть окно"
+                aria-label={t('closeDialog')}
                 className="rounded-full border border-line p-2 text-mute hover:text-ink"
               >
                 <X size={16} />

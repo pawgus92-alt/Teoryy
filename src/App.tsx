@@ -5,10 +5,12 @@ import { AddTheoryPage } from './pages/AddTheoryPage'
 import { HomePage } from './pages/HomePage'
 import { StatsPage } from './pages/StatsPage'
 import { TheoryPage } from './pages/TheoryPage'
+import { useI18n } from './i18n/useI18n'
 import { useTheoryStore } from './store/useTheoryStore'
 
 export default function App() {
   const toast = useTheoryStore((state) => state.toast)
+  const { t } = useI18n()
 
   return (
     <div className="min-h-screen">
@@ -24,7 +26,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs leading-5 text-mute">
-        Данные живут в localStorage этого браузера. Стор ходит в один репозиторий — его можно заменить на REST, Supabase или Firebase, не переписывая страницы.
+        {t('footer')}
       </footer>
       {toast && <Toast message={toast} />}
     </div>
@@ -40,21 +42,22 @@ function Toast({ message }: { message: string }) {
 }
 
 function NotFound() {
+  const { t } = useI18n()
   useEffect(() => {
-    document.title = 'Страница не найдена — Теории'
+    document.title = t('docMissing', { brand: t('brand') })
     return () => {
-      document.title = 'Теории'
+      document.title = t('brand')
     }
-  }, [])
+  }, [t])
 
   return (
     <div className="py-20 text-center">
       <p className="text-5xl" aria-hidden>
         🧭
       </p>
-      <h1 className="mt-4 font-serif text-4xl">Такой страницы нет</h1>
+      <h1 className="mt-4 font-serif text-4xl">{t('pageMissing')}</h1>
       <Link to="/" className="mt-3 inline-block text-sm font-semibold text-indigo-700 dark:text-indigo-300">
-        В ленту
+        {t('toFeed')}
       </Link>
     </div>
   )
