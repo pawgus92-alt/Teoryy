@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Теории — платформа для публикации, обсуждения и голосования за теории и отслеживания их сбытия."
+    />
+    <meta name="theme-color" content="#0c0e14" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,520;8..60,650;8..60,700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Теории</title>
+    <script>
+      try {
+        const raw = localStorage.getItem('teorii.v1')
+        const theme = raw ? JSON.parse(raw).theme : 'dark'
+        document.documentElement.classList.toggle('dark', theme !== 'light')
+        document.querySelector('meta[name="theme-color"]').setAttribute(
+          'content',
+          theme === 'light' ? '#f6f3ec' : '#0c0e14',
+        )
+      } catch (e) {
+        document.documentElement.classList.add('dark')
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
