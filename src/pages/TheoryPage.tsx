@@ -146,9 +146,9 @@ export function TheoryPage() {
         <p className="mt-2 text-xs text-mute">{t('voteHint')}</p>
       </div>
 
-      <p className="mt-8 font-serif text-2xl leading-snug text-ink/90">{shown.summary}</p>
+      <p className="mt-8 max-w-[66ch] font-serif text-[1.35rem] font-medium leading-snug text-ink/90">{shown.summary}</p>
       {paragraphs.length > 0 && (
-        <div className="mt-6 space-y-4 text-[17px] leading-8">
+        <div className="read mt-6">
           {paragraphs.map((paragraph, index) => (
             <p key={index} className="whitespace-pre-wrap">
               {paragraph}

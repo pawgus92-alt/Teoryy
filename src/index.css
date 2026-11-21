@@ -3,22 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --bg: 246 243 236;
-  --card: 255 253 248;
-  --ink: 22 21 28;
-  --mute: 90 86 102;
-  --line: 224 218 206;
+  --bg: 246 241 230;
+  --card: 255 251 244;
+  --ink: 42 34 26;
+  --mute: 108 96 84;
+  --line: 226 214 196;
   --accent: 79 70 229;
+  --glow: 196 140 74;
   color-scheme: light;
 }
 
 .dark {
-  --bg: 12 14 20;
-  --card: 21 25 34;
-  --ink: 236 234 243;
-  --mute: 168 163 184;
-  --line: 46 52 68;
-  --accent: 129 140 248;
+  --bg: 28 25 22;
+  --card: 40 35 31;
+  --ink: 244 236 224;
+  --mute: 186 174 158;
+  --line: 68 60 52;
+  --accent: 167 164 255;
+  --glow: 214 164 96;
   color-scheme: dark;
 }
 
@@ -33,6 +35,8 @@ body {
   background: rgb(var(--bg));
   color: rgb(var(--ink));
   font-family: Manrope, system-ui, sans-serif;
+  font-size: 16.5px;
+  line-height: 1.6;
   text-rendering: optimizeLegibility;
 }
 
@@ -43,8 +47,35 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(920px 420px at -8% -12%, rgb(var(--accent) / 0.18), transparent 58%),
-    radial-gradient(680px 360px at 110% -8%, rgb(139 92 246 / 0.14), transparent 52%);
+    radial-gradient(880px 460px at -6% -16%, rgb(var(--accent) / 0.1), transparent 60%),
+    radial-gradient(720px 420px at 108% -10%, rgb(var(--glow) / 0.16), transparent 56%);
+}
+
+.font-serif,
+.read,
+.read-comment {
+  font-optical-sizing: auto;
+}
+
+.read {
+  max-width: 66ch;
+  font-family: Literata, 'Iowan Old Style', Palatino, Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 460;
+  line-height: 1.78;
+  color: rgb(var(--ink) / 0.94);
+}
+
+.read p + p {
+  margin-top: 1.2em;
+}
+
+.read-comment {
+  font-family: Literata, 'Iowan Old Style', Palatino, Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 460;
+  line-height: 1.7;
+  color: rgb(var(--ink) / 0.92);
 }
 
 ::selection {

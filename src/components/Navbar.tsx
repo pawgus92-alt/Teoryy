@@ -43,8 +43,8 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-bg/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-        <NavLink to="/" end className="mr-auto flex items-center gap-2">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:gap-3">
+        <NavLink to="/" end className="mr-auto flex min-w-0 items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-amber-200" aria-hidden>
             <svg viewBox="0 0 32 32" className="h-5 w-5">
               <circle cx="16" cy="16" r="8" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -104,7 +104,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            className="max-w-40 truncate rounded-full border border-line px-3 py-2 text-sm font-medium"
+            className="max-w-24 truncate rounded-full border border-line px-3 py-2 text-sm font-medium sm:max-w-40"
             aria-expanded={open}
             aria-haspopup="dialog"
           >
