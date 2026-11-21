@@ -14,7 +14,7 @@ export default {
       },
       fontFamily: {
         sans: ['Manrope', 'system-ui', 'sans-serif'],
-        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
+        serif: ['Literata', 'Iowan Old Style', 'Palatino Linotype', 'Georgia', 'serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {

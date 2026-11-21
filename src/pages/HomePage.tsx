@@ -50,7 +50,7 @@ export function HomePage() {
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-indigo-700 dark:text-indigo-300">{t('journal')}</p>
           <h1 className="mt-2 max-w-3xl font-serif text-4xl leading-[1.05] sm:text-6xl">{t('heroTitle')}</h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-mute">{t('heroText')}</p>
+          <p className="mt-4 max-w-2xl text-[1.05rem] leading-7 text-ink/75">{t('heroText')}</p>
           <button
             type="button"
             onClick={() => setOpen(true)}

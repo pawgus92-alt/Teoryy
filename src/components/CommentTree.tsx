@@ -100,7 +100,7 @@ function CommentNode({ theoryId, comment, depth }: { theoryId: string; comment: 
           <span className="font-semibold text-ink">{displayAuthor(comment.author, false, t('anonymous'))}</span>
           <time dateTime={comment.createdAt}>{formatDate(comment.createdAt, locale)}</time>
         </header>
-        <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{comment.text}</p>
+        <p className="read-comment mt-2 whitespace-pre-wrap">{comment.text}</p>
         <button type="button" onClick={() => setOpen((value) => !value)} className="mt-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
           {open ? t('hideReply') : t('reply')}
         </button>

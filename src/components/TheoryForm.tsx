@@ -58,9 +58,9 @@ export function TheoryForm({
             </span>
           </div>
           <h3 className="mt-3 font-serif text-3xl leading-tight">{checked.value.title}</h3>
-          <p className="mt-3 text-sm leading-6 text-mute">{checked.value.summary}</p>
+          <p className="mt-3 font-serif text-lg leading-snug text-ink/85">{checked.value.summary}</p>
           {checked.value.body && (
-            <div className="mt-4 space-y-3 text-sm leading-6">
+            <div className="read mt-4">
               {checked.value.body.split(/\n{2,}/).map((paragraph, index) => (
                 <p key={index} className="whitespace-pre-wrap">
                   {paragraph}

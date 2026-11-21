@@ -30,7 +30,7 @@ export function TheoryCard({ theory, index }: { theory: Theory; index: number })
         </div>
         <div>
           <h2 className="font-serif text-2xl leading-tight text-ink">{shown.title}</h2>
-          <p className="mt-2 line-clamp-3 text-sm leading-6 text-mute">{shown.summary}</p>
+          <p className="mt-2 line-clamp-3 font-serif text-[1.02rem] leading-6 text-ink/80">{shown.summary}</p>
         </div>
         {shown.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
